@@ -1,0 +1,41 @@
+name: JAROS 4.0 Android Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Extract project
+        run: |
+          unzip JAROS_4_0_alpha1.zip -d source
+
+      - name: Build APK
+        run: |
+          cd source/JAROS_4_0
+          gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: JAROS-4.0-APK
+          path: source/JAROS_4_0/app/build/outputs/apk/debug/*.apk
